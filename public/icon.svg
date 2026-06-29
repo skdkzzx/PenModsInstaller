@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="110" fill="url(#g)"/>
+  <!-- 钢笔头 -->
+  <path d="M256 80c-24 0-44 16-52 40L120 340c-8 20 0 44 18 56l118 76 118-76c18-12 26-36 18-56L308 120c-8-24-28-40-52-40Z" fill="#fff" opacity="0.95"/>
+  <path d="M195 305c-6 0-10-7-7-14l70-190c3-8 9-8 12 0l70 190c3 7-1 14-7 14H195Z" fill="#6366f1" opacity="0.8"/>
+  <line x1="256" y1="250" x2="256" y2="400" stroke="#fff" stroke-width="6" opacity="0.35"/>
+  <!-- 高光 -->
+  <ellipse cx="170" cy="130" rx="50" ry="20" fill="#fff" opacity="0.06"/>
+</svg>

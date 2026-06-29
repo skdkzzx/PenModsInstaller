@@ -1,0 +1,17 @@
+{
+  "name": "PenMods 安装器",
+  "short_name": "PenMods安装",
+  "description": "有道词典笔 PenMods 一键安装工具，手机 OTG 连接即可安装",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#1e3a5f",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

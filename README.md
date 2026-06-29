@@ -23,6 +23,12 @@
 
 ---
 
+### 在线使用
+
+👉 **https://pen.skdkzzx.dpdns.org** — 直接打开即可使用。
+
+> WebUSB 需要 HTTPS 环境，在线部署已自带 HTTPS。
+
 ## 简介
 
 **做这个工具的初衷**：原版 [PenMods](https://github.com/PenUniverse/PenMods) 安装需要操作命令行、配置 ADB 环境，对没有电脑或不熟悉命令行的用户来说门槛很高。这个项目就是为了解决这个问题——**手机 OTG 连接词典笔，打开浏览器就能一键安装、更新、卸载 PenMods，还能直接管理设备文件。全程无需电脑，无需安装 adb 或任何驱动。**
@@ -79,12 +85,6 @@
 | **连接方式** | **Android 手机**：OTG 转接头 + 数据线连接词典笔；**电脑**：直接数据线连接 |
 | **浏览器** | Chrome / Edge（需支持 [WebUSB](https://developer.mozilla.org/en-US/docs/Web/API/USB)） |
 
-### 在线使用
-
-👉 **https://pen.skdkzzx.dpdns.org** — 直接打开即可使用。
-
-> WebUSB 需要 HTTPS 环境，在线部署已自带 HTTPS。
-
 ### 本地启动
 
 ```bash
@@ -92,7 +92,7 @@ git clone https://github.com/skdkzzx/PenModsInstaller.git
 cd PenModsInstaller
 npm install
 npm run dev
-```
+“```”
 
 浏览器打开 `http://localhost:5173` 即可使用。
 
@@ -311,7 +311,7 @@ npm run lint
 
 ## 联系作者
 
-<div align="right">
+<div align="lift">
 
 | 方式 | 信息 |
 |------|------|

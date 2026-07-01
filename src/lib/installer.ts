@@ -57,7 +57,7 @@ export class Installer {
   }
 
   async install(
-    _components: { base: boolean; certs: boolean; rime: boolean },
+    components: { base: boolean; certs: boolean; rime: boolean },
     customFiles?: InstallFile[]
   ) {
     this.log = [];
@@ -65,7 +65,8 @@ export class Installer {
     try {
       // ====== 1. 推送所有文件（sync 协议不需要 auth）======
       this.emit('pushing-files', 0, '', '开始推送文件…');
-      const files = customFiles || getInstallFiles();
+      let files = customFiles || getInstallFiles();
+      if (!components.certs) files = files.filter(f => f.name !== 'CA.zip');
       const totalFiles = files.length;
 
       for (let i = 0; i < totalFiles; i++) {
@@ -107,7 +108,9 @@ export class Installer {
       const cmds = [
         "echo 'CherryYoudao' | auth",
         "mount -o remount,rw /",
-        "cd /userdisk && unzip -oq CA.zip && mv CA/* /etc/ssl/certs/ 2>/dev/null; echo 'certs done'",
+        ...(components.certs
+          ? ["cd /userdisk && unzip -oq CA.zip && mv CA/* /etc/ssl/certs/ 2>/dev/null; echo 'certs done'"]
+          : []),
         "cd /userdata/PenMods && chmod +x patch.sh misc/init.sh misc/patchelf",
         "cd /userdata/PenMods/misc && ./init.sh; echo 'init done'",
         "cd /userdata/PenMods && ./patch.sh; echo 'patch done'",

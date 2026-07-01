@@ -639,6 +639,32 @@ function App() {
           })}
         </div>
 
+        {/* ===== ADB 开启指南 ===== */}
+        {step === 'idle' && (
+          <details className="card !p-3 group">
+            <summary className="text-xs font-medium text-[#64748b] cursor-pointer select-none flex items-center gap-2">
+              <svg className="w-3.5 h-3.5 text-[#94a3b8] group-open:rotate-90 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+              如何开启词典笔 ADB 调试？
+            </summary>
+            <div className="mt-3 space-y-3 pl-5">
+              {[
+                ['打开「设置」', '在词典笔主屏幕找到并点击"设置"图标'],
+                ['进入「关于」', '在设置列表中向下滑动，找到并点击"关于"'],
+                ['点击「法律监管」10 次', '快速连续点击"法律监管"或"法律信息"10 次，直到屏幕提示"ADB 已开启"'],
+                ['确认开启', '看到"ADB 已开启"提示即表示操作成功'],
+              ].map(([title, desc], i) => (
+                <div key={i} className="flex gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 bg-[#2563eb] text-white rounded-full flex items-center justify-center text-[11px] font-bold">{i + 1}</span>
+                  <div>
+                    <div className="text-sm font-medium text-[#0f172a]">{title}</div>
+                    <div className="text-xs text-[#64748b] mt-0.5">{desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </details>
+        )}
+
         {/* ===== 1. 安装包 ===== */}
         <section className="card">
           <div className="flex items-center gap-2 mb-4">

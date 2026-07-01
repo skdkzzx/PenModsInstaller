@@ -11,7 +11,7 @@
     <img src="https://img.shields.io/badge/PWA-enabled-5a0fc8" alt="PWA">
   </p>
 
-</div>
+“\div>
 
 ---
 
@@ -22,6 +22,12 @@
 > 详情见首次使用时的完整弹窗声明。
 
 ---
+
+### 在线使用
+
+👉 **https://pen.skdkzzx.dpdns.org** — 直接打开即可使用。
+
+> WebUSB 需要 HTTPS 环境，在线部署已自带 HTTPS。
 
 ## 简介
 
@@ -62,7 +68,6 @@
 |------|------|---------|
 | **有道词典笔 2 代** | YDP02x | ✅ 完全支持 |
 | **有道词典笔 3 代** | YDPG3 | ✅ 完全支持 |
-| **其他 Android 手机/平板** | — | ⚠️ 仅支持 USB 连接，需安装 Termux 等 ADB 环境 |
 
 > **Android 手机用户注意**：手机需使用 **OTG 转接头** 连接词典笔的数据线。大部分 Android 手机支持 OTG，少部分机型（如部分华为、小米旧款）需在设置中开启 OTG 功能。
 >
@@ -79,12 +84,6 @@
 | **连接方式** | **Android 手机**：OTG 转接头 + 数据线连接词典笔；**电脑**：直接数据线连接 |
 | **浏览器** | Chrome / Edge（需支持 [WebUSB](https://developer.mozilla.org/en-US/docs/Web/API/USB)） |
 
-### 在线使用
-
-👉 **https://pen.skdkzzx.dpdns.org** — 直接打开即可使用。
-
-> WebUSB 需要 HTTPS 环境，在线部署已自带 HTTPS。
-
 ### 本地启动
 
 ```bash
@@ -92,7 +91,7 @@ git clone https://github.com/skdkzzx/PenModsInstaller.git
 cd PenModsInstaller
 npm install
 npm run dev
-```
+“```”
 
 浏览器打开 `http://localhost:5173` 即可使用。
 
@@ -118,9 +117,9 @@ npm run build
 ### 安装 PenMods
 
 1. **词典笔上开启 ADB**：设置 → 关于 → 法律监管 → 点击 10 次
-2. 用 OTG 线连接手机/电脑和词典笔
+2. 使用 OTG 线连接手机/电脑与词典笔
 3. 打开 PenMods Installer 网页
-4. 点击右上角 **「连接设备」**
+4. 点击右上角 **“连接设备”**
 5. 浏览器弹出 USB 选择窗口，选择你的词典笔
 6. 连接成功后，点击 **「开始安装」**
 7. 等待进度条走完（约 1-3 分钟）
@@ -142,7 +141,7 @@ npm run build
 1. 连接设备
 2. 点击 **「卸载」** 按钮（红色）
 3. 确认后自动完成：
-   - 恢复原版 `YoudaoDictPen` 应用
+   - 恢复原版 `有道词典笔` 应用
    - 删除 `/userdata/PenMods` 目录
    - 重启设备
 
@@ -175,7 +174,7 @@ PenMods.zip
 │   ├── libcrypt.so
 │   └── libstdc++.so
 └── Rime/
-    ├── *.dict.yaml
+├── *.dict.yaml
     ├── *.schema.yaml
     ├── cn_dicts/
     ├── en_dicts/
@@ -199,7 +198,7 @@ ZIP 中有的文件用 ZIP 的，没有的自动使用内置版本。
 
 | 技术 | 用途 |
 |------|------|
-| **React 19** | UI 框架 |
+| 4. 点击右上角 **「连接设备」**React 19** | UI 框架 |
 | **TypeScript** | 类型安全 |
 | **Vite 8** | 构建工具 |
 | **Tailwind CSS 4** | 样式 |
@@ -311,7 +310,7 @@ npm run lint
 
 ## 联系作者
 
-<div align="right">
+<div align="lift">
 
 | 方式 | 信息 |
 |------|------|

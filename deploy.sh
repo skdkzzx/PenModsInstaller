@@ -116,12 +116,21 @@ if [ -n "$NGINX_CONF" ]; then
     echo "  已添加 WebSocket 反代规则"
   fi
 
-  # 测试配置
-  if nginx -t 2>/dev/null || openresty -t 2>/dev/null; then
-    nginx -s reload 2>/dev/null || openresty -s reload 2>/dev/null || systemctl reload nginx 2>/dev/null || systemctl reload openresty 2>/dev/null || echo "  请手动重载 Nginx"
-    echo "  Nginx 已重载"
+  # 测试配置（openresty 或 nginx）
+  if command -v openresty &>/dev/null; then
+    if openresty -t 2>/dev/null; then
+      openresty -s reload 2>/dev/null && echo "  OpenResty 已重载" || echo "  请手动重载 OpenResty"
+    else
+      echo "  ⚠️ OpenResty 配置测试失败，请手动检查"
+    fi
+  elif command -v nginx &>/dev/null; then
+    if nginx -t 2>/dev/null; then
+      nginx -s reload 2>/dev/null && echo "  Nginx 已重载" || echo "  请手动重载 Nginx"
+    else
+      echo "  ⚠️ Nginx 配置测试失败，请手动检查"
+    fi
   else
-    echo "  ⚠️ Nginx 配置测试失败，请手动检查"
+    echo "  ⚠️ 未找到 nginx/openresty 命令，请手动重载"
   fi
 else
   echo "  ⚠️ 未找到 Nginx 配置文件，请手动添加规则："

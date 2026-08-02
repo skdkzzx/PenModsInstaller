@@ -2,12 +2,15 @@
 /**
  * PenMods Installer — 生产环境服务器
  *
- * 同时提供:
- *   1. 静态文件服务 (dist/)
- *   2. WebSocket SSH 代理 (与 Vite 开发插件相同的能力)
+ * 两种模式:
+ *   1. standalone（默认）: 同时提供静态文件 + WebSocket SSH 代理
+ *   2. --ws-only: 仅 WebSocket 代理，静态文件由 Nginx 等反代提供
+ *      用于 1Panel / Nginx 反代部署场景
  *
  * 用法:
- *   node server.mjs [端口] [SSH密码]
+ *   node server.mjs [端口] [SSH密码]          # 独立模式 (默认)
+ *   node server.mjs --ws-only [端口] [SSH密码] # 仅 WebSocket 代理
+ *
  *   默认端口: 8022
  *   默认密码: CherryYoudao
  */
@@ -20,8 +23,10 @@ import { WebSocketServer } from 'ws';
 import { Client } from 'ssh2';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = parseInt(process.argv[2]) || 8022;
-const DEFAULT_SSH_PASS = process.env.DEFAULT_SSH_PASS || process.argv[3] || 'CherryYoudao';
+const args = process.argv.slice(2);
+const WS_ONLY = args.includes('--ws-only');
+const PORT = parseInt(WS_ONLY ? (args[1] || '8022') : (args[0] || '8022')) || 8022;
+const DEFAULT_SSH_PASS = process.env.DEFAULT_SSH_PASS || (WS_ONLY ? (args[2] || 'CherryYoudao') : (args[1] || 'CherryYoudao')) || 'CherryYoudao';
 
 const DIST_DIR = path.join(__dirname, 'dist');
 
@@ -38,8 +43,10 @@ const MIME = {
   '.woff2':'font/woff2',
 };
 
-// ── HTTP 服务：静态文件 ──
-const httpServer = http.createServer((req, res) => {
+// ── HTTP 服务 ──
+const httpServer = http.createServer(WS_ONLY
+  ? (_req, res) => { res.writeHead(404); res.end(); }
+  : (req, res) => {
   // 只处理 GET 请求
   if (req.method !== 'GET') {
     res.writeHead(405);
@@ -239,13 +246,14 @@ httpServer.on('upgrade', (req, sock, head) => {
 // ── 启动 ──
 httpServer.listen(PORT, '0.0.0.0', () => {
   console.log('============================================');
-  console.log('  PenMods Installer — 生产服务器');
+  console.log('  PenMods Installer — SSH 代理服务');
   console.log('============================================');
-  console.log(`  地址: http://0.0.0.0:${PORT}`);
+  console.log(`  模式: ${WS_ONLY ? '仅 WebSocket 代理 (配合 Nginx 使用)' : '独立模式 (自带静态文件服务)'}`);
+  console.log(`  端口: ${PORT}`);
   console.log(`  默认 SSH 密码: ${DEFAULT_SSH_PASS}`);
-  console.log(`  静态文件: ${DIST_DIR}`);
+  if (!WS_ONLY) console.log(`  静态文件: ${DIST_DIR}`);
   console.log('============================================');
-  console.log('  浏览器访问后，SSH 代理 WebSocket 自动就绪');
+  console.log('  WebSocket 端点: ws://HOST:PORT/ws/ssh?target=IP:22&password=...');
   console.log('============================================');
 });
 

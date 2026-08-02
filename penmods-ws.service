@@ -1,0 +1,18 @@
+[Unit]
+Description=PenMods Installer — WebSocket SSH 代理（配合 Nginx 使用）
+After=network.target
+
+[Service]
+Type=simple
+User=nobody
+Group=nogroup
+Restart=always
+RestartSec=5
+WorkingDirectory=/opt/penmods
+ExecStart=/usr/bin/node /opt/penmods/server.mjs --ws-only 8022
+Environment=NODE_ENV=production
+# 如需修改默认 SSH 密码，取消注释下一行并修改
+# Environment=DEFAULT_SSH_PASS=CherryYoudao
+
+[Install]
+WantedBy=multi-user.target

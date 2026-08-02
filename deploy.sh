@@ -66,34 +66,62 @@ systemctl daemon-reload
 systemctl enable penmods-ws
 systemctl restart penmods-ws
 
-# 5. 生成 Nginx 配置片段
-echo "[5/5] 生成 Nginx 配置片段..."
-cat > /tmp/penmods-nginx.conf << 'NGINXEOF'
-# 把这个加到 1Panel 网站配置的 server block 中
-location /ws/ssh {
-    proxy_pass http://127.0.0.1:8022;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_read_timeout 86400s;
-}
-NGINXEOF
+# 5. 自动修改 Nginx 配置
+echo "[5/5] 自动添加 WebSocket 反代规则到 Nginx..."
 
-echo ""
-echo "============================================"
-echo "  ✅ 部署完成！"
-echo "============================================"
-echo ""
-echo "  代理服务已启动: 127.0.0.1:$PORT"
-echo "  状态: $(systemctl is-active penmods-ws)"
-echo ""
-echo "  最后一步：在 1Panel 网站设置中添加反向代理规则"
-echo "  配置内容已保存到: /tmp/penmods-nginx.conf"
-echo "  复制粘贴到 1Panel → 网站 → 配置文件 即可"
-echo ""
-echo "  内容如下："
-cat /tmp/penmods-nginx.conf
-echo ""
-echo "============================================"
+# 查找 Nginx 配置文件
+NGINX_CONF=""
+SEARCH_PATHS=(
+  "/usr/local/openresty/nginx/conf/conf.d"
+  "/etc/nginx/conf.d"
+  "/etc/nginx/sites-enabled"
+  "/etc/nginx/sites-available"
+  "/www/sites/penmods/conf"
+  "/opt/1panel"
+)
+
+for dir in "${SEARCH_PATHS[@]}"; do
+  found=$(grep -rl "server_name.*pen.skdkzzx.dpdns.org" "$dir" 2>/dev/null || true)
+  if [ -n "$found" ]; then
+    NGINX_CONF=$(echo "$found" | head -1)
+    break
+  fi
+done
+
+if [ -z "$NGINX_CONF" ]; then
+  # 最后尝试从 1Panel 数据库查找
+  NGINX_CONF=$(find / -path "*/penmods*" -name "*.conf" -type f 2>/dev/null | head -1)
+fi
+
+WS_BLOCK="
+    location /ws/ssh {
+        proxy_pass http://127.0.0.1:8022;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection \"upgrade\";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_read_timeout 86400s;
+    }"
+
+if [ -n "$NGINX_CONF" ]; then
+  echo "  找到配置文件: $NGINX_CONF"
+  if grep -q "location /ws/ssh" "$NGINX_CONF" 2>/dev/null; then
+    echo "  配置已存在，跳过"
+  else
+    # 在最后一个 } 前插入
+    sed -i '$i'"$WS_BLOCK" "$NGINX_CONF"
+    echo "  已添加 WebSocket 反代规则"
+  fi
+
+  # 测试配置
+  if nginx -t 2>/dev/null || openresty -t 2>/dev/null; then
+    nginx -s reload 2>/dev/null || openresty -s reload 2>/dev/null || systemctl reload nginx 2>/dev/null || systemctl reload openresty 2>/dev/null || echo "  请手动重载 Nginx"
+    echo "  Nginx 已重载"
+  else
+    echo "  ⚠️ Nginx 配置测试失败，请手动检查"
+  fi
+else
+  echo "  ⚠️ 未找到 Nginx 配置文件，请手动添加以下规则："
+  echo "$WS_BLOCK"
+fi

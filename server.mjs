@@ -21,7 +21,7 @@ import { Client } from 'ssh2';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = parseInt(process.argv[2]) || 8022;
-const DEFAULT_SSH_PASS = process.argv[3] || 'CherryYoudao';
+const DEFAULT_SSH_PASS = process.env.DEFAULT_SSH_PASS || process.argv[3] || 'CherryYoudao';
 
 const DIST_DIR = path.join(__dirname, 'dist');
 
@@ -71,7 +71,12 @@ const httpServer = http.createServer((req, res) => {
       return;
     }
     const ext = path.extname(filePath);
-    res.writeHead(200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
+    res.writeHead(200, {
+      'Content-Type': MIME[ext] || 'application/octet-stream',
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self' ws: wss:; img-src 'self' data: blob:; font-src 'self' data:;",
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+    });
     res.end(data);
   });
 });

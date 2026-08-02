@@ -32,10 +32,25 @@ if not exist "node_modules" (
     )
 )
 
-echo [3/3] Starting dev server...
-echo.
-echo     Open http://localhost:5173 in browser
-echo     Press Ctrl+C to stop
-echo.
-npm run dev
+if "%1"=="prod" (
+    echo [3/3] Building and starting production server...
+    echo.
+    echo     Open http://localhost:8022 in browser
+    echo     Press Ctrl+C to stop
+    echo.
+    npm run build
+    if errorlevel 1 (
+        echo ERROR: Build failed
+        pause
+        exit /b 1
+    )
+    node server.mjs
+) else (
+    echo [3/3] Starting dev server...
+    echo.
+    echo     Open http://localhost:5173 in browser
+    echo     Press Ctrl+C to stop
+    echo.
+    npm run dev
+)
 pause

@@ -89,28 +89,30 @@ for dir in "${SEARCH_PATHS[@]}"; do
 done
 
 if [ -z "$NGINX_CONF" ]; then
-  # 最后尝试从 1Panel 数据库查找
   NGINX_CONF=$(find / -path "*/penmods*" -name "*.conf" -type f 2>/dev/null | head -1)
 fi
-
-WS_BLOCK="
-    location /ws/ssh {
-        proxy_pass http://127.0.0.1:8022;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade \$http_upgrade;
-        proxy_set_header Connection \"upgrade\";
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_read_timeout 86400s;
-    }"
 
 if [ -n "$NGINX_CONF" ]; then
   echo "  找到配置文件: $NGINX_CONF"
   if grep -q "location /ws/ssh" "$NGINX_CONF" 2>/dev/null; then
     echo "  配置已存在，跳过"
   else
-    # 在最后一个 } 前插入
-    sed -i '$i'"$WS_BLOCK" "$NGINX_CONF"
+    # 在最后一个 } 前插入（用 awk 处理多行，避免 sed 转义问题）
+    awk '
+      /^}/ && !found {
+        print "    location /ws/ssh {"
+        print "        proxy_pass http://127.0.0.1:8022;"
+        print "        proxy_http_version 1.1;"
+        print "        proxy_set_header Upgrade $http_upgrade;"
+        print "        proxy_set_header Connection \"upgrade\";"
+        print "        proxy_set_header Host $host;"
+        print "        proxy_set_header X-Real-IP $remote_addr;"
+        print "        proxy_read_timeout 86400s;"
+        print "    }"
+        found = 1
+      }
+      { print }
+    ' "$NGINX_CONF" > "${NGINX_CONF}.tmp" && mv "${NGINX_CONF}.tmp" "$NGINX_CONF"
     echo "  已添加 WebSocket 反代规则"
   fi
 
@@ -122,6 +124,24 @@ if [ -n "$NGINX_CONF" ]; then
     echo "  ⚠️ Nginx 配置测试失败，请手动检查"
   fi
 else
-  echo "  ⚠️ 未找到 Nginx 配置文件，请手动添加以下规则："
-  echo "$WS_BLOCK"
+  echo "  ⚠️ 未找到 Nginx 配置文件，请手动添加规则："
+  echo '    location /ws/ssh {'
+  echo '        proxy_pass http://127.0.0.1:8022;'
+  echo '        proxy_http_version 1.1;'
+  echo '        proxy_set_header Upgrade $http_upgrade;'
+  echo '        proxy_set_header Connection "upgrade";'
+  echo '        proxy_set_header Host $host;'
+  echo '        proxy_set_header X-Real-IP $remote_addr;'
+  echo '        proxy_read_timeout 86400s;'
+  echo '    }'
 fi
+
+echo ""
+echo "============================================"
+echo "  ✅ 全部部署完成！"
+echo "============================================"
+echo ""
+echo "  代理服务状态: $(systemctl is-active penmods-ws 2>/dev/null || echo 'unknown')"
+echo "  WebSocket 端点: ws://pen.skdkzzx.dpdns.org/ws/ssh"
+echo "  访问网站: http://pen.skdkzzx.dpdns.org"
+echo "============================================"
